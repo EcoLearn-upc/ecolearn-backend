@@ -14,7 +14,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collation = "usuarios")
+@Document(collection = "usuarios")
 public class Usuario {
 
     @Id
@@ -22,7 +22,7 @@ public class Usuario {
     private String nombre;
     @Indexed(unique = true)
 
-    private String correo;
+    private String email;
     private String password;
     private String rol;//estudiante, docente, admin
     private String grado;
