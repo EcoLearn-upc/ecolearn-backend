@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.http.HttpStatus;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -17,7 +20,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, Object>> handleEcoLearnException(EcoLearnException ex) {
         return buildResponse(ex.getStatus(), ex.getMessage());
     }
-
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<Map<String, Object>> handleNotFound(NoHandlerFoundException ex) {
+        return buildResponse(HttpStatus.NOT_FOUND, "Endpoint no encontrado");
+    }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
         String message = ex.getBindingResult().getFieldErrors().stream()

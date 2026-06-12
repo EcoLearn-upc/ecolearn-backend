@@ -29,7 +29,7 @@ public class MetricaAulaController {
 
     // GET /api/metricas/colegio — solo DOCENTE o ADMIN
     @GetMapping("/colegio")
-    @PreAuthorize("hasAnyAuthority('DOCENTE', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('DOCENTE', 'ADMIN')")
     public ResponseEntity<List<MetricaAula>> porColegio(Authentication auth) {
         Usuario usuario = usuarioService.findByEmail(auth.getName());
         return ResponseEntity.ok(metricaAulaService.obtenerPorColegio(usuario.getColegio()));

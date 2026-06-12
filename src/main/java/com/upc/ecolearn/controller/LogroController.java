@@ -35,7 +35,7 @@ public class LogroController {
 
     // POST /api/logros — solo ADMIN crea logros
     @PostMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Logro> crear(@RequestBody Logro logro) {
         return ResponseEntity.ok(logroService.crear(logro));
     }

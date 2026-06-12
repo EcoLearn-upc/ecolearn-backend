@@ -44,13 +44,13 @@ public class RetoController {
 
     // ADMIN
     @PostMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Reto> crear(@RequestBody Reto reto) {
         return ResponseEntity.ok(retoService.crear(reto));
     }
 
     @PutMapping("/{retoId}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Reto> actualizar(
             @PathVariable String retoId,
             @RequestBody Reto reto) {
@@ -58,7 +58,7 @@ public class RetoController {
     }
 
     @DeleteMapping("/{retoId}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> eliminar(@PathVariable String retoId) {
         retoService.eliminar(retoId);
         return ResponseEntity.noContent().build();
