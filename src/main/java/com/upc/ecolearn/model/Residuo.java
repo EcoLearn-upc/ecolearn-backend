@@ -12,13 +12,13 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "residuos")
-
 public class Residuo {
+
     @Id
     private String id;
     private String usuarioId;
-    private String imageUrl;
-    private String categoriaDetectada;//plástico, papel, vidrio, orgánico
+    private String gridFsId;           // referencia al archivo en GridFS
+    private String categoriaDetectada;
     private double confianza;
     private boolean esCorrecta;
     private int puntosGanados;
