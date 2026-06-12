@@ -17,6 +17,8 @@ public interface ResiduoRepository extends MongoRepository<Residuo, String> {
     );
 
     long countByUsuarioId(String usuarioId);
+    List<Residuo> findByUsuarioIdOrderByFechaDesc(String usuarioId);
+    long countByUsuarioIdAndEsCorrecta(String usuarioId, boolean esCorrecta);
 
     long countByUsuarioIdAndCategoriaDetectada(
             String usuarioId,

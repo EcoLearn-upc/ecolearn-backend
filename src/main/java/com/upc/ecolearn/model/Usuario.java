@@ -4,12 +4,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.index.Indexed;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -19,19 +18,31 @@ public class Usuario {
 
     @Id
     private String id;
-    private String nombre;
-    @Indexed(unique = true)
 
+    private String nombre;
+
+    @Indexed(unique = true)
     private String email;
+
     private String password;
-    private String rol;//estudiante, docente, admin
+
+    private String rol; // ESTUDIANTE, DOCENTE, ADMIN
+
     private String grado;
     private String seccion;
     private String colegio;
+
+    // grado + seccion componen el aula lógica (ej: "5A")
+    // no se persiste, se deriva cuando se necesita
+    public String getAula() {
+        return (grado != null && seccion != null) ? grado + seccion : null;
+    }
+
     private int puntos;
     private int nivel;
-    private List<String> logros = new ArrayList<>();
-    private LocalDateTime fechaRegistro;
-    private boolean activo;
 
+    @CreatedDate
+    private LocalDateTime fechaRegistro;
+
+    private boolean activo;
 }
