@@ -41,7 +41,7 @@ public class RealAiClassifierClient implements AiClassifierClient {
 
             Map<?, ?> result = response.getBody();
             return new AiClasificacionResult(
-                    (String) result.get("categoria"),
+                    (String) result.get("clase"),
                     ((Number) result.get("confianza")).doubleValue(),
                     true
             );
