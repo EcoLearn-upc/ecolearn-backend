@@ -32,6 +32,8 @@ public class Usuario {
     private String seccion;
     private String colegio;
 
+    private String pin; // solo aplica si rol == ESTUDIANTE, null para DOCENTE/ADMIN
+
     // grado + seccion componen el aula lógica (ej: "5A")
     // no se persiste, se deriva cuando se necesita
     public String getAula() {

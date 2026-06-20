@@ -38,6 +38,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/test/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/residuos/imagen/**").permitAll()
+                        .requestMatchers("/api/clases/login").permitAll()
+                        .requestMatchers("/api/clases/codigo/**").permitAll()
                         .requestMatchers("/error").permitAll()  // agregar esta línea
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter,
