@@ -21,6 +21,6 @@ public class MockAiClassifierClient implements AiClassifierClient {
         Random random = new Random();
         String categoria = CATEGORIAS.get(random.nextInt(CATEGORIAS.size()));
         double confianza = 0.70 + (random.nextDouble() * 0.29); // 0.70 - 0.99
-        return new AiClasificacionResult(categoria, confianza, true);
+        return new AiClasificacionResult(categoria, confianza, true, null);
     }
 }

@@ -2,6 +2,7 @@ package com.upc.ecolearn.service;
 
 import com.upc.ecolearn.client.AiClassifierClient;
 import com.upc.ecolearn.config.PuntosConfig;
+import com.upc.ecolearn.dto.ResiduoResponse;
 import com.upc.ecolearn.exception.EcoLearnException;
 import com.upc.ecolearn.model.Residuo;
 import com.upc.ecolearn.repository.ResiduoRepository;
@@ -34,23 +35,18 @@ public class ResiduoService {
     @Autowired private RetoService retoService;
     @Autowired private MetricaAulaService metricaAulaService;
 
-
-    public Residuo clasificar(String usuarioId, MultipartFile imagen) {
-        // 1. Guardar imagen en GridFS
+    public ResiduoResponse clasificar(String usuarioId, MultipartFile imagen) {
         String gridFsId = guardarImagen(imagen);
 
-        // 2. Llamar al AI Classifier
         AiClassifierClient.AiClasificacionResult resultado = aiClassifierClient.clasificar(imagen);
 
         if (!resultado.exitoso()) {
             throw new EcoLearnException("Error al clasificar la imagen", HttpStatus.UNPROCESSABLE_ENTITY);
         }
 
-        // 3. Calcular puntos y correctitud
         boolean esCorrecta = puntosConfig.esClasificacionCorrecta(resultado.confianza());
         int puntos = puntosConfig.calcularPuntos(resultado.confianza());
 
-        // 4. Persistir residuo
         Residuo residuo = new Residuo();
         residuo.setUsuarioId(usuarioId);
         residuo.setGridFsId(gridFsId);
@@ -61,13 +57,22 @@ public class ResiduoService {
         residuo.setFecha(LocalDateTime.now());
         residuoRepository.save(residuo);
 
-        // 5. Actualizar puntos del usuario y verificar logros
         usuarioService.agregarPuntos(usuarioId, puntos);
         logroService.verificarLogros(usuarioId);
         retoService.actualizarProgreso(usuarioId, resultado.categoria());
         metricaAulaService.actualizarMetrica(usuarioId);
 
-        return residuo;
+        return new ResiduoResponse(
+                residuo.getId(),
+                residuo.getUsuarioId(),
+                residuo.getGridFsId(),
+                residuo.getCategoriaDetectada(),
+                residuo.getConfianza(),
+                residuo.isEsCorrecta(),
+                residuo.getPuntosGanados(),
+                residuo.getFecha(),
+                resultado.recomendacion()
+        );
     }
 
     public InputStream obtenerImagen(String gridFsId) {

@@ -65,7 +65,24 @@ public class ClaseService {
                 "alumnos", nombres
         );
     }
+    public Map<String, Object> obtenerDetallePorCodigo(String codigoAcceso) {
+        Clase clase = claseRepository.findByCodigoAcceso(codigoAcceso)
+                .orElseThrow(() -> new EcoLearnException("Código de clase inválido", HttpStatus.NOT_FOUND));
 
+        List<Usuario> alumnos = clase.getAlumnosIds().stream()
+                .map(usuarioRepository::findById)
+                .filter(java.util.Optional::isPresent)
+                .map(java.util.Optional::get)
+                .toList();
+
+        return Map.of(
+                "claseId", clase.getId(),
+                "nombre", clase.getNombre(),
+                "colegio", clase.getColegio(),
+                "codigoAcceso", clase.getCodigoAcceso(),
+                "alumnos", alumnos
+        );
+    }
     // Docente agrega alumnos por nombre — genera Usuario + PIN para cada uno
     public List<Usuario> agregarAlumnos(String claseId, List<String> nombres) {
         Clase clase = findById(claseId);
@@ -111,7 +128,7 @@ public class ClaseService {
                 .findFirst()
                 .orElseThrow(() -> new EcoLearnException("Alumno no encontrado en esta clase", HttpStatus.NOT_FOUND));
 
-        if (!passwordEncoder.matches(pin, usuario.getPassword())) {
+        if (!pin.equals(usuario.getPin())) {
             throw new EcoLearnException("PIN incorrecto", HttpStatus.UNAUTHORIZED);
         }
 

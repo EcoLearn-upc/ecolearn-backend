@@ -9,6 +9,7 @@ public interface AiClassifierClient {
     record AiClasificacionResult(
             String categoria,
             double confianza,
-            boolean exitoso
+            boolean exitoso,
+            String recomendacion
     ) {}
 }

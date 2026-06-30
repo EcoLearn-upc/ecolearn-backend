@@ -43,7 +43,8 @@ public class RealAiClassifierClient implements AiClassifierClient {
             return new AiClasificacionResult(
                     (String) result.get("clase"),
                     ((Number) result.get("confianza")).doubleValue(),
-                    true
+                    true,
+                    (String) result.get("recomendacion")
             );
         } catch (IOException e) {
             throw new EcoLearnException("Error al procesar la imagen", HttpStatus.UNPROCESSABLE_ENTITY);

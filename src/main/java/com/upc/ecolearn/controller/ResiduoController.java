@@ -1,5 +1,6 @@
 package com.upc.ecolearn.controller;
 
+import com.upc.ecolearn.dto.ResiduoResponse;
 import com.upc.ecolearn.model.Residuo;
 import com.upc.ecolearn.model.Usuario;
 import com.upc.ecolearn.service.ResiduoService;
@@ -22,7 +23,7 @@ public class ResiduoController {
     @Autowired private UsuarioService usuarioService;
 
     @PostMapping(value = "/clasificar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Residuo> clasificar(
+    public ResponseEntity<ResiduoResponse> clasificar(
             @RequestParam("imagen") MultipartFile imagen,
             Authentication auth) {
         Usuario usuario = usuarioService.findByEmail(auth.getName());

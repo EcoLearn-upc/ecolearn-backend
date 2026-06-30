@@ -19,4 +19,5 @@ public class ResiduoResponse {
     private boolean esCorrecta;
     private int puntosGanados;
     private LocalDateTime fecha;
+    private String recomendacion;
 }

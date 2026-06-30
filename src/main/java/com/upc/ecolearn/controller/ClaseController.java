@@ -57,7 +57,12 @@ public class ClaseController {
     public ResponseEntity<Map<String, Object>> obtenerPorCodigo(@PathVariable String codigoAcceso) {
         return ResponseEntity.ok(claseService.obtenerInfoPublica(codigoAcceso));
     }
-
+    // GET /api/clases/codigo/{codigoAcceso}/detalle — DOCENTE ve clase completa + alumnos con XP
+    @GetMapping("/codigo/{codigoAcceso}/detalle")
+    @PreAuthorize("hasRole('DOCENTE')")
+    public ResponseEntity<Map<String, Object>> obtenerDetallePorCodigo(@PathVariable String codigoAcceso) {
+        return ResponseEntity.ok(claseService.obtenerDetallePorCodigo(codigoAcceso));
+    }
     // GET /api/clases/{claseId}/alumnos — DOCENTE ve lista de alumnos (con PIN)
     @GetMapping("/{claseId}/alumnos")
     @PreAuthorize("hasRole('DOCENTE')")
