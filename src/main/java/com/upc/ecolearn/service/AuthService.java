@@ -30,7 +30,7 @@ public class AuthService {
         usuario.setNombre(request.getNombre());
         usuario.setEmail(request.getEmail());
         usuario.setPassword(passwordEncoder.encode(request.getPassword()));
-        usuario.setRol(request.getRol().toUpperCase());
+        usuario.setRol("DOCENTE");
         usuario.setGrado(request.getGrado());
         usuario.setSeccion(request.getSeccion());
         usuario.setColegio(request.getColegio());
