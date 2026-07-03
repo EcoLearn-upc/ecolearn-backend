@@ -43,6 +43,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/clases/codigo/**").permitAll()
                         .requestMatchers("/error").permitAll()  // agregar esta línea
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers("/api/residuos/warmup").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class);
