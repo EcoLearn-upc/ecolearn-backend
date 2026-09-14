@@ -36,13 +36,15 @@ public class ResiduoService {
     @Autowired private MetricaAulaService metricaAulaService;
 
     public ResiduoResponse clasificar(String usuarioId, MultipartFile imagen) {
-        String gridFsId = guardarImagen(imagen);
-
+        // Primero clasificar — si falla, no se guarda nada
         AiClassifierClient.AiClasificacionResult resultado = aiClassifierClient.clasificar(imagen);
 
         if (!resultado.exitoso()) {
             throw new EcoLearnException("Error al clasificar la imagen", HttpStatus.UNPROCESSABLE_ENTITY);
         }
+
+        // Solo guardamos la imagen si la clasificación fue exitosa
+        String gridFsId = guardarImagen(imagen);
 
         boolean esCorrecta = puntosConfig.esClasificacionCorrecta(resultado.confianza());
         int puntos = puntosConfig.calcularPuntos(resultado.confianza());
