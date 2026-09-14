@@ -15,4 +15,6 @@ public interface ClaseRepository extends MongoRepository<Clase, String> {
     List<Clase> findByDocenteId(String docenteId);
 
     boolean existsByCodigoAcceso(String codigoAcceso);
+
+    Optional<Clase> findByAlumnosIdsContaining(String alumnoId);
 }

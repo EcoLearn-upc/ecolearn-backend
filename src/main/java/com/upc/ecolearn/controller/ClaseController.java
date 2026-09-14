@@ -80,4 +80,11 @@ public class ClaseController {
         );
         return ResponseEntity.ok(Map.of("token", token));
     }
+    // GET /api/clases/mi-clase — ESTUDIANTE ve su clase y compañeros
+    @GetMapping("/mi-clase")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Map<String, Object>> miClase(Authentication auth) {
+        Usuario alumno = usuarioService.findByEmail(auth.getName());
+        return ResponseEntity.ok(claseService.obtenerMiClase(alumno.getId()));
+    }
 }

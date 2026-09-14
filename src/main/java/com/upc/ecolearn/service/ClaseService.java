@@ -162,4 +162,30 @@ public class ClaseService {
         String slug = nombre.trim().toLowerCase().replaceAll("\\s+", ".");
         return slug + "." + codigoClase.toLowerCase() + "@ecolearn.local";
     }
+
+    public Map<String, Object> obtenerMiClase(String alumnoId) {
+        Clase clase = claseRepository.findByAlumnosIdsContaining(alumnoId)
+                .orElseThrow(() -> new EcoLearnException("No perteneces a ninguna clase", HttpStatus.NOT_FOUND));
+
+        List<Map<String, Object>> alumnos = clase.getAlumnosIds().stream()
+                .map(usuarioRepository::findById)
+                .filter(java.util.Optional::isPresent)
+                .map(java.util.Optional::get)
+                .map(u -> Map.<String, Object>of(
+                        "nombre", u.getNombre(),
+                        "puntos", u.getPuntos(),
+                        "nivel", u.getNivel()
+                ))
+                .sorted((a, b) -> Integer.compare((int) b.get("puntos"), (int) a.get("puntos")))
+                .toList();
+
+        return Map.of(
+                "claseId", clase.getId(),
+                "nombre", clase.getNombre(),
+                "colegio", clase.getColegio(),
+                "codigo", clase.getCodigoAcceso(),
+                "numAlumnos", clase.getAlumnosIds().size(),
+                "alumnos", alumnos
+        );
+    }
 }
