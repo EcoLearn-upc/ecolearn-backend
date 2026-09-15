@@ -1,5 +1,6 @@
 package com.upc.ecolearn.controller;
 
+import com.upc.ecolearn.dto.ClasificacionPreguntaResponse;
 import com.upc.ecolearn.dto.ResiduoResponse;
 import com.upc.ecolearn.model.Residuo;
 import com.upc.ecolearn.model.Usuario;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/residuos")
@@ -35,6 +37,26 @@ public class ResiduoController {
             Authentication auth) {
         Usuario usuario = usuarioService.findByEmail(auth.getName());
         return ResponseEntity.ok(residuoService.clasificar(usuario.getId(), imagen));
+    }
+
+    @PostMapping(value = "/clasificar-pregunta", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ClasificacionPreguntaResponse> clasificarConPregunta(
+            @RequestParam("imagen") MultipartFile imagen,
+            Authentication auth) {
+        Usuario usuario = usuarioService.findByEmail(auth.getName());
+        return ResponseEntity.ok(residuoService.clasificarConPregunta(usuario.getId(), imagen));
+    }
+
+    @PostMapping("/responder-prediccion")
+    public ResponseEntity<ResiduoResponse> responderPrediccion(
+            @RequestBody Map<String, String> body,
+            Authentication auth) {
+        Usuario usuario = usuarioService.findByEmail(auth.getName());
+        return ResponseEntity.ok(residuoService.responderPrediccion(
+                usuario.getId(),
+                body.get("sesionId"),
+                body.get("respuestaUsuario")
+        ));
     }
 
     @GetMapping("/historial")
