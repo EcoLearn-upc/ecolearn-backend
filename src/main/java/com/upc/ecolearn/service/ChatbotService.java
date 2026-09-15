@@ -91,7 +91,7 @@ public class ChatbotService {
             return (String) message.get("content");
 
         } catch (Exception e) {
-            throw new EcoLearnException("EcoBot no disponible temporalmente", HttpStatus.SERVICE_UNAVAILABLE);
+            throw new EcoLearnException("EcoBot error: " + e.getMessage(), HttpStatus.SERVICE_UNAVAILABLE);
         }
     }
 
