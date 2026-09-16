@@ -12,9 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.WeekFields;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class MetricaAulaService {
@@ -24,7 +24,6 @@ public class MetricaAulaService {
     @Autowired private ResiduoRepository residuoRepository;
     @Autowired private RetoUsuarioRepository retoUsuarioRepository;
 
-    // Llamado desde ResiduoService al clasificar
     public void actualizarMetrica(String usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId).orElse(null);
         if (usuario == null || usuario.getAula() == null) return;
@@ -35,22 +34,31 @@ public class MetricaAulaService {
                         usuario.getColegio(), usuario.getGrado(), usuario.getSeccion(), semana)
                 .orElseGet(() -> crearNuevaMetrica(usuario, semana));
 
-        // Recalcular desde los datos reales del aula
-        List<Usuario> compañeros = usuarioRepository.findByColegioAndGradoAndSeccion(
+        List<Usuario> companeros = usuarioRepository.findByColegioAndGradoAndSeccion(
                 usuario.getColegio(), usuario.getGrado(), usuario.getSeccion());
 
         int totalClasificaciones = 0;
         int totalPuntos = 0;
         long totalRetos = 0;
-        Map<String, Long> categorias = new java.util.HashMap<>();
+        int alumnosActivos = 0;
+        Map<String, Long> categorias = new HashMap<>();
 
-        for (Usuario u : compañeros) {
+        for (Usuario u : companeros) {
             List<Residuo> residuos = residuoRepository.findByUsuarioId(u.getId());
             totalClasificaciones += residuos.size();
             totalPuntos += u.getPuntos();
             totalRetos += retoUsuarioRepository.countByUsuarioIdAndCompletadoTrue(u.getId());
             residuos.forEach(r -> categorias.merge(r.getCategoriaDetectada(), 1L, Long::sum));
+
+            boolean activoEstaSemana = u.getPuntos() > 0;
+            if (activoEstaSemana) alumnosActivos++;
         }
+
+        int total = companeros.size();
+        int alumnosInactivos = total - alumnosActivos;
+        int porcentajeParticipacion = total > 0 ? Math.round((alumnosActivos * 100f) / total) : 0;
+        int progresoGeneral = total > 0 ? Math.round((totalPuntos * 100f) / (total * 100)) : 0;
+        progresoGeneral = Math.min(progresoGeneral, 100);
 
         String categoriaMas = categorias.entrySet().stream()
                 .max(Map.Entry.comparingByValue())
@@ -61,8 +69,19 @@ public class MetricaAulaService {
         metrica.setTotalPuntos(totalPuntos);
         metrica.setRetosCompletados((int) totalRetos);
         metrica.setCategoriaMasReciclada(categoriaMas);
+        metrica.setAlumnosActivos(alumnosActivos);
+        metrica.setAlumnosInactivos(alumnosInactivos);
+        metrica.setPorcentajeParticipacion(porcentajeParticipacion);
+        metrica.setProgresoGeneral(progresoGeneral);
         metrica.setFechaActualizacion(LocalDateTime.now());
         metricaAulaRepository.save(metrica);
+    }
+
+    public MetricaAula obtenerMetricaActual(String colegio, String grado, String seccion) {
+        String semana = getSemanaActual();
+        return metricaAulaRepository
+                .findByColegioAndGradoAndSeccionAndSemana(colegio, grado, seccion, semana)
+                .orElse(null);
     }
 
     public List<MetricaAula> obtenerPorColegio(String colegio) {

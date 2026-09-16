@@ -188,4 +188,8 @@ public class ClaseService {
                 "alumnos", alumnos
         );
     }
+    public Clase findByCodigoAcceso(String codigoAcceso) {
+        return claseRepository.findByCodigoAcceso(codigoAcceso)
+                .orElseThrow(() -> new EcoLearnException("Código de clase inválido", HttpStatus.NOT_FOUND));
+    }
 }

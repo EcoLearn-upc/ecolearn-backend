@@ -24,5 +24,9 @@ public class MetricaAula {
     private int retosCompletados;
     private String categoriaMasReciclada;
     private String semana;
+    private int porcentajeParticipacion;
+    private int alumnosActivos;
+    private int alumnosInactivos;
+    private int progresoGeneral;
     private LocalDateTime fechaActualizacion;
 }

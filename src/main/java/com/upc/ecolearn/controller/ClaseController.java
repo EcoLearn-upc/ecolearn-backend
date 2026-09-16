@@ -1,8 +1,10 @@
 package com.upc.ecolearn.controller;
 
 import com.upc.ecolearn.model.Clase;
+import com.upc.ecolearn.model.MetricaAula;
 import com.upc.ecolearn.model.Usuario;
 import com.upc.ecolearn.service.ClaseService;
+import com.upc.ecolearn.service.MetricaAulaService;
 import com.upc.ecolearn.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +21,8 @@ public class ClaseController {
 
     @Autowired private ClaseService claseService;
     @Autowired private UsuarioService usuarioService;
+    @Autowired private MetricaAulaService metricaAulaService;
 
-    // POST /api/clases — DOCENTE crea clase
     @PostMapping
     @PreAuthorize("hasRole('DOCENTE')")
     public ResponseEntity<Clase> crear(@RequestBody Map<String, String> body, Authentication auth) {
@@ -36,7 +38,6 @@ public class ClaseController {
         return ResponseEntity.ok(clase);
     }
 
-    // POST /api/clases/{claseId}/alumnos — DOCENTE agrega alumnos por nombre
     @PostMapping("/{claseId}/alumnos")
     @PreAuthorize("hasRole('DOCENTE')")
     public ResponseEntity<List<Usuario>> agregarAlumnos(
@@ -45,32 +46,40 @@ public class ClaseController {
         return ResponseEntity.ok(claseService.agregarAlumnos(claseId, body.get("nombres")));
     }
 
-    // GET /api/clases/mis-clases — DOCENTE ve sus clases
     @GetMapping("/mis-clases")
     @PreAuthorize("hasRole('DOCENTE')")
     public ResponseEntity<List<Clase>> misClases(Authentication auth) {
         Usuario docente = usuarioService.findByEmail(auth.getName());
         return ResponseEntity.ok(claseService.obtenerClasesDocente(docente.getId()));
     }
-    // GET /api/clases/codigo/{codigoAcceso} — consulta pública para validar código y listar nombres
+
     @GetMapping("/codigo/{codigoAcceso}")
     public ResponseEntity<Map<String, Object>> obtenerPorCodigo(@PathVariable String codigoAcceso) {
         return ResponseEntity.ok(claseService.obtenerInfoPublica(codigoAcceso));
     }
-    // GET /api/clases/codigo/{codigoAcceso}/detalle — DOCENTE ve clase completa + alumnos con XP
+
     @GetMapping("/codigo/{codigoAcceso}/detalle")
     @PreAuthorize("hasRole('DOCENTE')")
     public ResponseEntity<Map<String, Object>> obtenerDetallePorCodigo(@PathVariable String codigoAcceso) {
         return ResponseEntity.ok(claseService.obtenerDetallePorCodigo(codigoAcceso));
     }
-    // GET /api/clases/{claseId}/alumnos — DOCENTE ve lista de alumnos (con PIN)
+
+    @GetMapping("/codigo/{codigoAcceso}/metricas")
+    @PreAuthorize("hasRole('DOCENTE')")
+    public ResponseEntity<MetricaAula> obtenerMetricas(
+            @PathVariable String codigoAcceso) {
+        Clase clase = claseService.findByCodigoAcceso(codigoAcceso);
+        MetricaAula metrica = metricaAulaService.obtenerMetricaActual(
+                clase.getColegio(), clase.getGrado(), clase.getSeccion());
+        return ResponseEntity.ok(metrica != null ? metrica : new MetricaAula());
+    }
+
     @GetMapping("/{claseId}/alumnos")
     @PreAuthorize("hasRole('DOCENTE')")
     public ResponseEntity<List<Usuario>> alumnos(@PathVariable String claseId) {
         return ResponseEntity.ok(claseService.obtenerAlumnos(claseId));
     }
 
-    // POST /api/clases/login — ESTUDIANTE entra con código + nombre + pin (público)
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> loginEstudiante(@RequestBody Map<String, String> body) {
         String token = claseService.loginEstudiante(
@@ -80,7 +89,7 @@ public class ClaseController {
         );
         return ResponseEntity.ok(Map.of("token", token));
     }
-    // GET /api/clases/mi-clase — ESTUDIANTE ve su clase y compañeros
+
     @GetMapping("/mi-clase")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Map<String, Object>> miClase(Authentication auth) {
